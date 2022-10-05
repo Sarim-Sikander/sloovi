@@ -21,6 +21,11 @@ records = db.register
 templates = db.template
 
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "Welcome to the home page"}), 200
+
+
 @app.route("/register", methods=["post"])
 def register():
     message = ""
