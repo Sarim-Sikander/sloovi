@@ -2,7 +2,7 @@ import datetime
 
 import bcrypt
 import pymongo
-from flask import Flask, jsonify, redirect, request, session, url_for
+from flask import Flask, jsonify, redirect, request, session, url_for,render_template
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required)
 
@@ -23,7 +23,7 @@ templates = db.template
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Welcome to the home page"}), 200
+    return render_template('home.html', content="Hello World!")
 
 
 @app.route("/register", methods=["post"])
