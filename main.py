@@ -32,12 +32,13 @@ def register():
     if "email" in session:
         return redirect(url_for("logged_in"))
     if request.method == "POST":
-        f_user = request.form.get("first_name")
-        l_user = request.form.get("last_name")
+        data = request.get_json()
+        f_user = data.get("first_name")
+        l_user = data.get("last_name")
         user = f"{f_user} {l_user}"
-        email = request.form.get("email")
+        email = data.get("email")
 
-        password = request.form.get("password")
+        password = data.get("password")
 
         user_found = records.find_one({"name": user})
         email_found = records.find_one({"email": email})
@@ -73,8 +74,9 @@ def login():
         return redirect(url_for("logged_in"))
 
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
 
         if not (email_found := records.find_one({"email": email})):
             return jsonify({"msg": "The username or password is incorrect"}), 401
@@ -111,39 +113,43 @@ def template():
     if request.method not in ["POST", "GET", "PUT", "DELETE"]:
         return "Method not allowed"
     if request.method == "POST":
-        template_name = request.form["template_name"]
-        subject = request.form["subject"]
-        body = request.form["body"]
+        data = request.get_json()
+        template_name = data["template_name"]
+        subject = data["subject"]
+        body = data["body"]
         templates.insert_one(
             {"template_name": template_name, "subject": subject, "body": body}
         )
         return "Template created successfully"
     elif request.method == "PUT":
-        template_name = request.form["template_name"]
+        data = request.get_json()
+        template_name = data["template_name"]
         if not template_name:
             return "Please fill all the fields"
         find_one = {"template_name": template_name}
         update_this = {
             "$set": {
-                "template_name": request.form["new_template"],
-                "subject": request.form["new_subject"],
-                "body": request.form["new_body"],
+                "template_name": data["new_template"],
+                "subject": data["new_subject"],
+                "body": data["new_body"],
             }
         }
         templates.update_one(find_one, update_this)
         return "Template updated successfully"
     elif request.method == "DELETE":
-        template_name = request.form["template_name"]
+        data = request.get_json()
+        template_name = data["template_name"]
         templates.delete_one({"template_name": template_name})
         return "Template deleted successfully"
     elif request.method == "GET":
+        data = request.get_json()
         if template_name := templates.find_one(
             {
-                "template_name": request.form["template_name"],
+                "template_name": data["template_name"],
             }
         ):
             return template_name["template_name"]
-        temps = templates.find({"template_name": request.form["template_name"]})
+        temps = templates.find({"template_name": data["template_name"]})
         return [temp.get("template_name") for temp in temps]
 
 
