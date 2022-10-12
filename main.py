@@ -142,15 +142,15 @@ def template():
         templates.delete_one({"template_name": template_name})
         return "Template deleted successfully"
     elif request.method == "GET":
-        data = request.get_json()
-        if template_name := templates.find_one(
-            {
+        if data := request.get_json():
+            template_name = templates.find_one({
                 "template_name": data["template_name"],
-            }
-        ):
+            })
             return template_name["template_name"]
-        temps = templates.find({"template_name": data["template_name"]})
-        return [temp.get("template_name") for temp in temps]
+        temps = templates.find({})
+        return [{"template_name":temp.get("template_name"),
+                 "subject":temp.get("subject"),
+                 "body":temp.get("body")} for temp in temps]
 
 
 # end of code to run it
